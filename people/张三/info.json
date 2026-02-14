@@ -1,0 +1,16 @@
+{
+  "id": "张三",
+  "name": "示例人物",
+  "profileUrl": "photos/photos/profile.jpg",
+  "info": {
+    "born": "2000-01-01T00:00:00.000Z",
+    "died": "2024-01-01T00:00:00.000Z",
+    "年龄": 24,
+    "地点": "北京"
+  },
+  "websites": {
+    "Twitter": "https://twitter.com/example"
+  },
+  "bio": "<h1>生平介绍</h1>\n<p>这是示例人物的生平介绍内容。</p>\n<h2>早年经历</h2>\n<p>在这里添加人物的早年经历...</p>\n<h2>主要事迹</h2>\n<p>添加主要事迹...</p>\n<hr>\n<p><em>本条目由管理员贡献</em></p>\n",
+  "desc": "这是一句话简介"
+}

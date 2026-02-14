@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>示例人物 - 星语铭</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">星语铭</div>
+            <ul class="nav-links">
+                <li><a href="../../index.html">主页</a></li>
+                <li><a href="../../about.html">关于我们</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <section class="profile-header">
+                <img src="photos/photos/profile.jpg" alt="示例人物" class="profile-avatar-large" onerror="this.src='../../css/default-avatar.svg'">
+                <h1>示例人物</h1>
+                <div class="profile-info"><div class="profile-info-item"><strong>born：</strong>Sat Jan 01 2000 08:00:00 GMT+0800 (中国标准时间)</div><div class="profile-info-item"><strong>died：</strong>Mon Jan 01 2024 08:00:00 GMT+0800 (中国标准时间)</div><div class="profile-info-item"><strong>年龄：</strong>24</div><div class="profile-info-item"><strong>地点：</strong>北京</div></div>
+            </section>
+            <section class="profile-bio-section">
+                <h2 style="text-align: center; margin-bottom: 2rem;">生平介绍</h2>
+                <div style="line-height: 1.8;"><h1>生平介绍</h1>
+<p>这是示例人物的生平介绍内容。</p>
+<h2>早年经历</h2>
+<p>在这里添加人物的早年经历...</p>
+<h2>主要事迹</h2>
+<p>添加主要事迹...</p>
+<hr>
+<p><em>本条目由管理员贡献</em></p>
+</div>
+            </section>
+            <section class="memories-section">
+                <h2 style="text-align: center; margin-bottom: 2rem;">回忆与祝福</h2>
+                <div id="commentsList"></div>
+                <div class="add-memory-form">
+                    <h3 style="margin-bottom: 1rem;">发表回忆</h3>
+                    <p style="margin-bottom: 1rem; color: var(--text-light);">
+                        由于是静态网站，评论功能需要 GitHub 账号
+                    </p>
+                    <a href="https://github.com/NatsukoYamamura/engrave-ren/discussions/new?category=general&title=%E3%80%90%E7%BA%AA%E5%BF%B5%E3%80%91%E7%A4%BA%E4%BE%8B%E4%BA%BA%E7%89%A9" 
+                       target="_blank" 
+                       class="btn">
+                        💬 在 GitHub 发表评论
+                    </a>
+                </div>
+            </section>
+            <section class="prevention-section">
+                <h3>🌟 请记住</h3>
+                <p>如果您正在经历困难时期，请不要犹豫寻求帮助。</p>
+                <p>全国心理援助热线：<strong>400-161-9995</strong></p>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 星语铭 | 由 <a href="https://novihare.cn/">Novi的导航站</a> 提供技术支持</p>
+    </footer>
+    <script>
+    const REPO_OWNER = 'NatsukoYamamura';
+    const REPO_NAME = 'engrave-ren';
+    const PERSON_NAME = '示例人物';
+    
+    async function loadComments() {
+        const list = document.getElementById('commentsList');
+        try {
+            const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=纪念&`);
+            if (!response.ok) throw new Error('Failed to load');
+            const issues = await response.json();
+            const filtered = issues.filter(i => i.title.includes(PERSON_NAME));
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-light); text-align: center;">暂无回忆，快来发表第一条吧！</p>';
+                return;
+            }
+            
+            list.innerHTML = filtered.map(issue => `
+                <div class="memory-item">
+                    <p>${issue.body}</p>
+                    <small style="color: var(--text-light);">
+                        —— ${issue.user.login} · ${new Date(issue.created_at).toLocaleDateString('zh-CN')}
+                    </small>
+                </div>
+            `).join('');
+        } catch (e) {
+            list.innerHTML = '<p style="color: var(--text-light); text-align: center;">加载评论失败，请直接在 GitHub 发表评论</p>';
+        }
+    }
+    loadComments();
+    </script>
+</body>
+</html>
