@@ -102,17 +102,29 @@ function renderUtterancesComments(pageIdentifier) {
     return `
         <section class="memories-section" id="commentsSection">
             <h2 style="text-align: center; margin-bottom: 2rem;">回忆与祝福</h2>
-            
-            <script src="https://utteranc.es/client.js"
-                repo="${config.repo}"
-                issue-term="${config.issueTerm}"
-                label="${config.label}"
-                theme="${config.theme}"
-                crossorigin="anonymous"
-                async>
-            </script>
+            <div id="utterances-container"></div>
         </section>
     `;
+}
+
+// 加载 Utterances 脚本
+function loadUtterances() {
+    const container = document.getElementById('utterances-container');
+    if (!container) return;
+    
+    const config = COMMENT_CONFIG.utterances;
+    const profileId = getProfileId() || 'home';
+    
+    const script = document.createElement('script');
+    script.src = 'https://utteranc.es/client.js';
+    script.setAttribute('repo', config.repo);
+    script.setAttribute('issue-term', 'pathname');
+    script.setAttribute('label', config.label);
+    script.setAttribute('theme', config.theme);
+    script.setAttribute('crossorigin', 'anonymous');
+    script.async = true;
+    
+    container.appendChild(script);
 }
 
 // ==================== 页面渲染 ====================
@@ -189,7 +201,7 @@ async function renderProfile(profile) {
         </section>
 
         ${renderCommentsSection()}
-
+        
         <section class="prevention-section">
             <h3>🌟 请记住</h3>
             <p>如果您正在经历困难时期，请不要犹豫寻求帮助。每个人都有获得支持和关怀的权利。</p>
@@ -205,6 +217,9 @@ async function renderProfile(profile) {
             </div>
         </section>
     `;
+    
+    // 加载 Utterances 评论
+    loadUtterances();
 }
 
 // 计算年龄
