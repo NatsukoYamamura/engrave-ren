@@ -1,30 +1,13 @@
 // 星语铭 - GitHub Pages 个人主页 JavaScript
 
 // ==================== 评论系统配置 ====================
-// 使用 Giscus (推荐) 或 Utterances
-// 详见: https://giscus.app 或 https://utteranc.es
-
 const COMMENT_CONFIG = {
-    // 评论系统: 'giscus' 或 'utterances'
     system: 'utterances',
-    
-    // Utterances 配置 (从 https://utteranc.es 获取)
     utterances: {
         repo: 'NatsukoYamamura/engrave-ren',
-        issueTerm: 'url',
+        issueTerm: 'pathname',
         label: 'comment',
         theme: 'github-light'
-    },
-    
-    // 备用: Giscus 配置 (当前不使用)
-    giscus: {
-        repo: '',
-        repoId: '',
-        category: 'Comments',
-        categoryId: '',
-        mapping: 'pathname',
-        theme: 'light',
-        lang: 'zh-CN'
     }
 };
 
@@ -34,7 +17,7 @@ function getUrlParam(param) {
     return urlParams.get(param);
 }
 
-// 获取人物ID (用于生成唯一标识)
+// 获取人物ID
 function getProfileId() {
     const profileId = getUrlParam('id') || getUrlParam('name');
     return profileId ? profileId.toLowerCase().replace(/\s+/g, '-') : '';
@@ -44,8 +27,7 @@ function getProfileId() {
 function renderCommentsSection() {
     const profileId = getProfileId();
     
-    // 如果未配置评论系统
-    if (!COMMENT_CONFIG.giscus.repo && !COMMENT_CONFIG.utterances.repo) {
+    if (!COMMENT_CONFIG.utterances.repo) {
         return `
             <section class="memories-section" id="commentsSection">
                 <h2 style="text-align: center; margin-bottom: 2rem;">回忆与祝福</h2>
@@ -56,48 +38,6 @@ function renderCommentsSection() {
             </section>
         `;
     }
-    
-    // 生成唯一的 pageIdentifier (使用 profile id)
-    const pageIdentifier = profileId || 'home';
-    
-    if (COMMENT_CONFIG.system === 'giscus') {
-        return renderGiscusComments(pageIdentifier);
-    } else {
-        return renderUtterancesComments(pageIdentifier);
-    }
-}
-
-// 渲染 Giscus 评论
-function renderGiscusComments(pageIdentifier) {
-    const config = COMMENT_CONFIG.giscus;
-    
-    return `
-        <section class="memories-section" id="commentsSection">
-            <h2 style="text-align: center; margin-bottom: 2rem;">回忆与祝福</h2>
-            
-            <script src="https://giscus.app/client.js"
-                data-repo="${config.repo}"
-                data-repo-id="${config.repoId}"
-                data-category="${config.category}"
-                data-category-id="${config.categoryId}"
-                data-mapping="${config.mapping}"
-                data-strict="0"
-                data-reactions-enabled="${config.reactionsEnabled}"
-                data-emit-metadata="${config.emitMetadata}"
-                data-input-position="${config.inputPosition}"
-                data-theme="${config.theme}"
-                data-lang="${config.lang}"
-                data-loading="lazy"
-                crossorigin="anonymous"
-                async>
-            </script>
-        </section>
-    `;
-}
-
-// 渲染 Utterances 评论
-function renderUtterancesComments(pageIdentifier) {
-    const config = COMMENT_CONFIG.utterances;
     
     return `
         <section class="memories-section" id="commentsSection">
@@ -130,7 +70,7 @@ function loadUtterances() {
 
 // 加载个人资料
 async function loadProfile() {
-    const profileId = getUrlParam('id');
+    const profileId = getProfileId();
     
     if (!profileId) {
         showError('未指定人物');
@@ -138,17 +78,26 @@ async function loadProfile() {
     }
     
     try {
-        const response = await fetch('/data/profiles.json');
-        const profiles = await response.json();
-        
-        const profile = profiles.find(p => p.id === profileId || p.name === profileId);
-        
-        if (!profile) {
+        // 加载基本信息
+        const infoResponse = await fetch(`/data/people/${profileId}/info.json`);
+        if (!infoResponse.ok) {
             showError('未找到该纪念人物');
             return;
         }
+        const profile = await infoResponse.json();
         
-        await renderProfile(profile);
+        // 尝试加载生平介绍
+        let bio = '';
+        try {
+            const bioResponse = await fetch(`/data/people/${profileId}/bio.md`);
+            if (bioResponse.ok) {
+                bio = await bioResponse.text();
+            }
+        } catch (e) {
+            console.log('无生平介绍');
+        }
+        
+        await renderProfile(profile, bio);
     } catch (error) {
         console.error('加载人物数据失败:', error);
         showError('加载失败，请稍后重试');
@@ -156,7 +105,7 @@ async function loadProfile() {
 }
 
 // 渲染个人资料页面
-async function renderProfile(profile) {
+async function renderProfile(profile, bio) {
     document.getElementById('pageTitle').textContent = `${profile.name} - 星语铭`;
     
     let ageText = profile.age || '';
@@ -164,7 +113,28 @@ async function renderProfile(profile) {
         ageText = calculateAge(profile.birthDate, profile.passDate);
     }
     
-    const avatar = profile.avatar || '/images/default-avatar.svg';
+    // 头像路径
+    const avatar = `/data/people/${profile.id}/avatar.jpg`;
+    
+    // 网站链接
+    let websiteLinks = '';
+    const websites = ['website', 'github', 'twitter', 'bilibili', 'zhihu', 'blog'];
+    const linkLabels = {
+        website: '网站',
+        github: 'GitHub',
+        twitter: 'Twitter',
+        bilibili: 'B站',
+        zhihu: '知乎',
+        blog: '博客'
+    };
+    
+    const links = websites.filter(s => profile[s]).map(s => {
+        return `<a href="${profile[s]}" target="_blank" style="color: var(--sky-blue); margin: 0 0.5rem;">${linkLabels[s]}</a>`;
+    });
+    
+    if (links.length > 0) {
+        websiteLinks = `<div class="profile-info-item"><strong>链接：</strong>${links.join('')}</div>`;
+    }
     
     const content = document.getElementById('profileContent');
     content.innerHTML = `
@@ -184,23 +154,17 @@ async function renderProfile(profile) {
                     <strong>已离开：</strong>${profile.passDate || '不详'}
                 </div>
                 ${ageText ? `<div class="profile-info-item"><strong>年龄：</strong>${ageText}</div>` : ''}
-                ${profile.website ? `<div class="profile-info-item"><strong>网站：</strong><a href="${profile.website}" target="_blank" style="color: var(--sky-blue);">${profile.website}</a></div>` : ''}
+                ${websiteLinks}
             </div>
         </section>
 
         <section class="profile-bio-section">
             <h2 style="text-align: center; margin-bottom: 2rem;">生平介绍</h2>
-            <div style="line-height: 1.8;">${parseMarkdown(profile.bio || '')}</div>
-            
-            ${profile.contributor ? `
-                <div style="margin-top: 2rem; padding: 1rem; background: var(--light-gray); border-radius: 8px; text-align: center;">
-                    <em>本条目贡献者：${profile.contributor}</em>
-                </div>
-            ` : ''}
+            <div style="line-height: 1.8;">${parseMarkdown(bio)}</div>
         </section>
 
         ${renderCommentsSection()}
-        
+
         <section class="prevention-section">
             <h3>🌟 请记住</h3>
             <p>如果您正在经历困难时期，请不要犹豫寻求帮助。每个人都有获得支持和关怀的权利。</p>

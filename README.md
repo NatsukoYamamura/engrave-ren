@@ -1,55 +1,79 @@
-# 星语铭 - GitHub Pages 版本
+# 星语铭 (engrave.ren)
 
-## 项目结构
+一个基于 GitHub Pages 的纪念网站，用于纪念那些已经离开的人。
+
+## 网址
+
+https://NatsukoYamamura.github.io/engrave-ren
+
+## 目录结构
 
 ```
-├── index.html          # 主页 - 显示人物列表
-├── profile.html       # 个人资料页面模板
-├── about.html         # 关于我们页面
-├── 404.html           # 404错误页面
-├── favicon.svg        # 网站图标
-├── .nojekyll         # GitHub Pages 配置
+/
+├── index.html              # 首页 - 显示纪念人物列表
+├── profile.html           # 个人纪念页面
+├── about.html             # 关于页面
+├── 404.html               # 404 错误页面
+├── favicon.svg            # 网站图标
 ├── css/
-│   └── style.css     # 样式文件
+│   └── style.css         # 样式文件
 ├── js/
-│   ├── main.js       # 主页JavaScript
-│   └── profile.js    # 个人页面JavaScript
-├── data/
-│   └── profiles.json # 人物数据
-└── images/
-    └── default-avatar.svg  # 默认头像
+│   ├── main.js           # 首页 JavaScript
+│   └── profile.js        # 个人页面 JavaScript
+├── images/
+│   └── default-avatar.svg # 默认头像
+└── data/
+    ├── profiles.json      # 纪念人物 ID 列表
+    └── people/
+        └── [人物ID]/
+            ├── info.json  # 基本信息
+            ├── bio.md     # 生平介绍
+            └── avatar.jpg # 头像图片
 ```
 
-## 数据格式
+## 添加新人物
 
-人物数据存储在 `data/profiles.json` 中，格式如下：
+1. 在 `data/people/` 下创建新文件夹，文件夹名称即为人物 ID
+2. 创建 `info.json` - 基本信息
+3. 创建 `bio.md` - 生平介绍（支持 Markdown）
+4. 添加 `avatar.jpg` - 头像图片（可选）
+
+### info.json 格式
 
 ```json
 {
-  "id": "unique-id",
-  "name": "姓名",
-  "handle": "昵称/用户名",
-  "aliases": "别名",
-  "location": "地点",
-  "birthDate": "出生日期",
-  "passDate": "离开日期",
-  "age": "年龄",
-  "website": "网站链接",
-  "bio": "生平介绍 (支持Markdown)",
-  "summary": "一言总结",
-  "contributor": "贡献者",
-  "avatar": "头像路径"
+  "id": "gqt",
+  "name": "Ara",
+  "handle": "aragqt",
+  "aliases": "Gqt, Aragqt",
+  "location": "法国巴黎",
+  "birthDate": "2003-02-21",
+  "passDate": "2025-06-22",
+  "website": "https://example.com"
 }
 ```
 
-## 添加新人
+### 更新人物列表
 
-1. 编辑 `data/profiles.json` 文件
-2. 添加新的人物对象
-3. 提交更改到 GitHub
+在 `data/profiles.json` 中添加人物 ID：
 
-## 注意事项
+```json
+["gqt", "zheermao101", "新人物ID"]
+```
 
-- GitHub Pages 不支持服务端数据库，所有数据通过 JSON 文件存储
-- 头像等图片文件应放在 `images/` 目录下
-- 使用 URL 参数 `?id=xxx` 或 `?name=xxx` 访问个人页面
+## 评论系统
+
+使用 [Utterances](https://utteranc.es) 基于 GitHub Issues 提供评论功能。
+
+配置位于 `js/profile.js` 中的 `COMMENT_CONFIG`。
+
+## 部署
+
+1. 将文件推送到 GitHub 仓库
+2. 进入仓库 Settings → Pages
+3. 选择 Source 为 `main` 分支
+4. 保存后即可访问
+
+## 技术支持
+
+由 [Novi的导航站](https://novihare.cn/) 提供技术支持

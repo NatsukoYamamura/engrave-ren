@@ -1,32 +1,51 @@
 // 星语铭 - GitHub Pages 主页面 JavaScript
 
+// 加载所有人物数据
+async function loadAllProfiles() {
+    try {
+        // 获取人物ID列表
+        const listResponse = await fetch('/data/profiles.json');
+        const profileIds = await listResponse.json();
+        
+        // 并行加载所有人物的基本信息
+        const profilePromises = profileIds.map(async (id) => {
+            try {
+                const response = await fetch(`/data/people/${id}/info.json`);
+                return await response.json();
+            } catch (e) {
+                console.error(`加载 ${id} 失败:`, e);
+                return null;
+            }
+        });
+        
+        const profiles = await Promise.all(profilePromises);
+        return profiles.filter(p => p !== null);
+    } catch (error) {
+        console.error('加载人物列表失败:', error);
+        return [];
+    }
+}
+
 // 加载纪念人物列表
 async function loadProfiles() {
-    try {
-        const response = await fetch('/data/profiles.json');
-        const profiles = await response.json();
-        
-        // 获取搜索参数
-        const urlParams = new URLSearchParams(window.location.search);
-        const searchQuery = urlParams.get('search') || '';
-        
-        // 过滤 profiles
-        let filteredProfiles = profiles;
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            filteredProfiles = profiles.filter(p => 
-                p.name.toLowerCase().includes(query) ||
-                (p.handle && p.handle.toLowerCase().includes(query)) ||
-                (p.aliases && p.aliases.toLowerCase().includes(query)) ||
-                (p.bio && p.bio.toLowerCase().includes(query))
-            );
-        }
-        
-        renderProfiles(filteredProfiles);
-    } catch (error) {
-        console.error('加载人物数据失败:', error);
-        renderProfiles([]);
+    const profiles = await loadAllProfiles();
+    
+    // 获取搜索参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search') || '';
+    
+    // 过滤 profiles
+    let filteredProfiles = profiles;
+    if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filteredProfiles = profiles.filter(p => 
+            (p.name && p.name.toLowerCase().includes(query)) ||
+            (p.handle && p.handle.toLowerCase().includes(query)) ||
+            (p.aliases && p.aliases.toLowerCase().includes(query))
+        );
     }
+    
+    renderProfiles(filteredProfiles);
 }
 
 // 渲染纪念人物卡片
@@ -47,7 +66,7 @@ function renderProfiles(profiles) {
     
     profilesGrid.innerHTML = profiles.map(profile => `
         <div class="profile-card" onclick="window.location.href='/profile.html?id=${encodeURIComponent(profile.id)}'">
-            <img src="${profile.avatar || '/images/default-avatar.svg'}" 
+            <img src="/data/people/${profile.id}/avatar.jpg" 
                  alt="${profile.name}" 
                  class="profile-avatar" 
                  onerror="this.src='/images/default-avatar.svg'">
@@ -59,18 +78,10 @@ function renderProfiles(profiles) {
 
 // 生成简介文字
 function generateBio(profile) {
-    if (profile.summary && profile.summary.trim()) {
-        return profile.summary;
-    }
-    
     const bioParts = [];
     
     if (profile.handle) {
         bioParts.push(`@${profile.handle}`);
-    }
-    
-    if (profile.age) {
-        bioParts.push(`${profile.age}岁`);
     }
     
     if (profile.location) {
@@ -90,10 +101,6 @@ function generateBio(profile) {
         } else {
             bioParts.push(profile.passDate);
         }
-    }
-    
-    if (bioParts.length === 0 && profile.bio) {
-        return profile.bio.length > 50 ? profile.bio.substring(0, 50) + '...' : profile.bio;
     }
     
     return bioParts.join(' · ') || '点击查看详情';
