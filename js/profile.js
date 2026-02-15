@@ -22,7 +22,7 @@ function getUrlParam(param) {
 // 获取人物ID
 function getProfileId() {
     const profileId = getUrlParam('id') || getUrlParam('name');
-    const result = profileId ? profileId.toLowerCase().replace(/\s+/g, '-') : '';
+    const result = profileId ? profileId.replace(/\s+/g, '-') : '';
     console.log('getProfileId:', result);  // 调试
     return result;
 }

@@ -47,11 +47,10 @@ async function loadProfiles() {
     // 过滤 profiles
     let filteredProfiles = profiles;
     if (searchQuery) {
-        const query = searchQuery.toLowerCase();
         filteredProfiles = profiles.filter(p => 
-            (p.name && p.name.toLowerCase().includes(query)) ||
-            (p.handle && p.handle.toLowerCase().includes(query)) ||
-            (p.aliases && p.aliases.toLowerCase().includes(query))
+            (p.name && p.name.includes(searchQuery)) ||
+            (p.handle && p.handle.includes(searchQuery)) ||
+            (p.aliases && p.aliases.includes(searchQuery))
         );
     }
     
