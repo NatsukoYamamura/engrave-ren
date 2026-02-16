@@ -30,7 +30,7 @@ function getProfileId() {
 // 渲染评论区域
 function renderCommentsSection() {
     const profileId = getProfileId();
-    
+
     if (!COMMENT_CONFIG.utterances.repo) {
         return `
             <section class="memories-section" id="commentsSection">
@@ -42,7 +42,7 @@ function renderCommentsSection() {
             </section>
         `;
     }
-    
+
     return `
         <section class="memories-section" id="commentsSection">
             <h2 style="text-align: center; margin-bottom: 2rem;">回忆与祝福</h2>
@@ -55,9 +55,9 @@ function renderCommentsSection() {
 function loadUtterances() {
     const container = document.getElementById('utterances-container');
     if (!container) return;
-    
+
     const config = COMMENT_CONFIG.utterances;
-    
+
     const script = document.createElement('script');
     script.src = 'https://utteranc.es/client.js';
     script.setAttribute('repo', config.repo);
@@ -66,7 +66,7 @@ function loadUtterances() {
     script.setAttribute('theme', config.theme);
     script.setAttribute('crossorigin', 'anonymous');
     script.async = true;
-    
+
     container.appendChild(script);
 }
 
@@ -76,25 +76,25 @@ function loadUtterances() {
 async function loadProfile() {
     const profileId = getProfileId();
     console.log('loadProfile, profileId:', profileId);  // 调试
-    
+
     if (!profileId) {
         showError('未指定人物');
         return;
     }
-    
+
     try {
         // 加载基本信息
         const infoUrl = `/data/people/${profileId}/info.json`;
         console.log('Fetching:', infoUrl);  // 调试
         const infoResponse = await fetch(infoUrl);
         console.log('Response status:', infoResponse.status);  // 调试
-        
+
         if (!infoResponse.ok) {
             showError('未找到该纪念人物: ' + profileId);
             return;
         }
         const profile = await infoResponse.json();
-        
+
         // 尝试加载生平介绍
         let bio = '';
         try {
@@ -107,7 +107,7 @@ async function loadProfile() {
         } catch (e) {
             console.log('无生平介绍');
         }
-        
+
         await renderProfile(profile, bio);
     } catch (error) {
         console.error('加载人物数据失败:', error);
@@ -118,15 +118,15 @@ async function loadProfile() {
 // 渲染个人资料页面
 async function renderProfile(profile, bio) {
     document.getElementById('pageTitle').textContent = `${profile.name} - 星语铭`;
-    
+
     let ageText = profile.age || '';
     if (profile.birthDate && profile.passDate && !profile.age) {
         ageText = calculateAge(profile.birthDate, profile.passDate);
     }
-    
+
     // 头像路径
     const avatar = `/data/people/${profile.id}/avatar.jpg`;
-    
+
     // 网站链接
     let websiteLinks = '';
     if (profile.websites && Array.isArray(profile.websites) && profile.websites.length > 0) {
@@ -136,7 +136,7 @@ async function renderProfile(profile, bio) {
         }).join(' ');
         websiteLinks = `<div class="profile-info-item"><strong>链接：</strong>${linksHtml}</div>`;
     }
-    
+
     const content = document.getElementById('profileContent');
     content.innerHTML = `
         <section class="profile-header">
@@ -181,7 +181,7 @@ async function renderProfile(profile, bio) {
             </div>
         </section>
     `;
-    
+
     // 加载 Utterances 评论
     loadUtterances();
 }
@@ -191,18 +191,18 @@ function calculateAge(birthDate, passDate) {
     try {
         const birth = new Date(birthDate);
         const pass = new Date(passDate);
-        
+
         if (isNaN(birth.getTime()) || isNaN(pass.getTime())) {
             return '';
         }
-        
+
         let age = pass.getFullYear() - birth.getFullYear();
         const monthDiff = pass.getMonth() - birth.getMonth();
-        
+
         if (monthDiff < 0 || (monthDiff === 0 && pass.getDate() < birth.getDate())) {
             age--;
         }
-        
+
         return age > 0 ? `${age}岁` : '';
     } catch (e) {
         return '';
@@ -212,14 +212,14 @@ function calculateAge(birthDate, passDate) {
 // 使用 marked.js 解析 Markdown
 function parseMarkdown(text) {
     if (!text) return '';
-    
+
     // 配置 marked
     marked.setOptions({
         breaks: true,      // 允许换行
         gfm: true,         // GitHub 风格 Markdown
         linkTarget: '_blank'  // 链接新窗口打开
     });
-    
+
     // 解析并消毒 HTML
     const html = marked.parse(text);
     return DOMPurify.sanitize(html, {
@@ -239,6 +239,30 @@ function showError(message) {
             <a href="/" class="btn">返回首页</a>
         </div>
     `;
+}
+
+// 动态年份
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// 初始化加载
+document.addEventListener('DOMContentLoaded', function () {
+    loadProfiles();
+});
+
+// 标准化 id 参数
+const urlParams = new URLSearchParams(window.location.search);
+let id = urlParams.get('id');
+
+if (id) {
+    const normalizedId = id.toLowerCase();
+
+    if (id !== normalizedId) {
+        window.history.replaceState({}, '', `${window.location.pathname}?id=${normalizedId}`);
+    }
+
+    // 使用 normalizedId 加载用户资料
+    console.log('加载用户资料:', normalizedId);
+    // loadProfile(normalizedId);
 }
 
 // 页面加载完成后执行
