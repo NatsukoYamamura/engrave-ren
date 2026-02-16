@@ -6,12 +6,12 @@ async function loadAllProfiles() {
         // 获取人物ID列表
         const listResponse = await fetch('/data/profiles.json');
         const profileIds = await listResponse.json();
-
+        
         if (!Array.isArray(profileIds)) {
             console.error('profiles.json 格式错误');
             return [];
         }
-
+        
         // 并行加载所有人物的基本信息
         const profilePromises = profileIds.map(async (id) => {
             if (!id) return null;
@@ -27,7 +27,7 @@ async function loadAllProfiles() {
                 return null;
             }
         });
-
+        
         const profiles = await Promise.all(profilePromises);
         return profiles.filter(p => p !== null && p.id);
     } catch (error) {
@@ -39,30 +39,30 @@ async function loadAllProfiles() {
 // 加载纪念人物列表
 async function loadProfiles() {
     const profiles = await loadAllProfiles();
-
+    
     // 获取搜索参数
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search') || '';
-
+    
     // 过滤 profiles
     let filteredProfiles = profiles;
     if (searchQuery) {
-        filteredProfiles = profiles.filter(p =>
+        filteredProfiles = profiles.filter(p => 
             (p.name && p.name.includes(searchQuery)) ||
             (p.handle && p.handle.includes(searchQuery)) ||
             (p.aliases && p.aliases.includes(searchQuery))
         );
     }
-
+    
     renderProfiles(filteredProfiles);
 }
 
 // 渲染纪念人物卡片
 function renderProfiles(profiles) {
     const profilesGrid = document.getElementById('profilesGrid');
-
+    
     if (!profilesGrid) return;
-
+    
     if (profiles.length === 0) {
         profilesGrid.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--pure-white); border-radius: 12px; box-shadow: 0 4px 20px var(--shadow);">
@@ -72,7 +72,7 @@ function renderProfiles(profiles) {
         `;
         return;
     }
-
+    
     profilesGrid.innerHTML = profiles.map(profile => `
         <div class="profile-card" onclick="window.location.href='/profile.html?id=${encodeURIComponent(profile.id)}'">
             <img src="/data/people/${profile.id}/avatar.jpg" 
@@ -88,29 +88,29 @@ function renderProfiles(profiles) {
 // 生成简介文字
 function generateBio(profile) {
     if (!profile) return '点击查看详情';
-
+    
     // 优先使用 summary
     if (profile.summary && profile.summary.trim()) {
         return profile.summary;
     }
-
+    
     return '点击查看详情';
 }
 
 // 搜索功能
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.getElementById('searchForm');
     const searchInput = document.getElementById('searchInput');
-
+    
     // 恢复搜索框内容
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search') || '';
     if (searchInput) {
         searchInput.value = searchQuery;
     }
-
+    
     if (searchForm) {
-        searchForm.addEventListener('submit', function (e) {
+        searchForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const query = searchInput.value.trim();
             if (query) {
@@ -120,9 +120,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
+    
     // 添加返回顶部按钮
-    window.addEventListener('scroll', function () {
+    window.addEventListener('scroll', function() {
         const scrollButton = document.getElementById('scrollToTop');
         if (!scrollButton) {
             const button = document.createElement('button');
@@ -146,12 +146,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 opacity: 0;
                 visibility: hidden;
             `;
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
             document.body.appendChild(button);
         }
-
+        
         const button = document.getElementById('scrollToTop');
         if (window.pageYOffset > 300) {
             button.style.opacity = '1';
@@ -161,9 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
             button.style.visibility = 'hidden';
         }
     });
-
+    
     // 键盘导航
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             const searchInput = document.getElementById('searchInput');
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchInput.focus();
             }
         }
-
+        
         if (e.key === 'Escape') {
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
@@ -179,12 +179,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-});
-
-// 动态年份
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// 初始化加载
-document.addEventListener('DOMContentLoaded', function () {
-    loadProfiles();
 });

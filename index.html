@@ -146,5 +146,14 @@
     </footer>
 
     <script src="/js/main.js"></script>
+    <script>
+        // 动态年份
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 初始化加载
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfiles();
+        });
+    </script>
 </body>
 </html>
