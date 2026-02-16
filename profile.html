@@ -19,6 +19,7 @@
             <ul class="nav-links">
                 <li><a href="/">主页</a></li>
                 <li><a href="/about.html">关于我们</a></li>
+                <li><a href="/compliance.html">合规声明</a></li>
             </ul>
         </nav>
     </header>
@@ -32,8 +33,21 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 星语铭</p>
+        <!-- 动态年份，避免未来时间 -->
+        <p>&copy; <span id="year"></span> 星语铭 | 非营利性人文记忆计划</p>
+        <p style="font-size: 0.8rem; color: #888;">本站托管于 GitHub Pages | 域名解析由阿里云提供</p>
     </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        // 动态年份
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 初始化加载
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfiles();
+        });
+    </script>
 
     <script src="/js/profile.js"></script>
 </body>
