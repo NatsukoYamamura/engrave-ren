@@ -126,6 +126,42 @@ function generateBio(profile) {
     return '点击查看详情';
 }
 
+// 渲染今日生日
+function renderBirthdays() {
+    const birthdaySection = document.getElementById('birthdaySection');
+    const birthdayGrid = document.getElementById('birthdayGrid');
+    if (!birthdaySection || !birthdayGrid) return;
+    
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    
+    const todayProfiles = cachedProfiles.filter(p => {
+        if (!p.birthDate) return false;
+        const parts = p.birthDate.split('-');
+        if (parts.length !== 3) return false;
+        return parseInt(parts[1]) === month && parseInt(parts[2]) === day;
+    });
+    
+    if (todayProfiles.length === 0) {
+        birthdaySection.style.display = 'none';
+        return;
+    }
+    
+    birthdaySection.style.display = 'block';
+    birthdayGrid.style.display = 'grid';
+    birthdayGrid.innerHTML = todayProfiles.map(profile => `
+        <div class="profile-card" onclick="window.location.href='/profile.html?id=${encodeURIComponent(profile.id)}'" style="cursor: pointer;">
+            <img src="/data/people/${profile.id}/avatar.jpg" 
+                 alt="${profile.name}" 
+                 class="profile-avatar" 
+                 onerror="this.src='/images/default-avatar.svg'">
+            <div class="profile-name">${profile.name}</div>
+            <div class="profile-bio">${generateBio(profile)}</div>
+        </div>
+    `).join('');
+}
+
 // 页面加载完成后的初始化
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.getElementById('searchForm');
@@ -134,7 +170,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1. 初始化加载数据
     loadProfiles();
     
-    // 2. 随机访问按钮
+    // 2. 渲染今日生日
+    renderBirthdays();
+    
+    // 3. 随机访问按钮
     const randomBtn = document.getElementById('randomBtn');
     if (randomBtn) {
         randomBtn.addEventListener('click', async function() {
