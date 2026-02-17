@@ -91,13 +91,15 @@
 
             <!-- 搜索区：确保前端搜索不收集用户数据 -->
             <section class="search-section">
-                <button type="button" class="btn" id="randomBtn" style="margin-bottom: 1rem;">🎲 随机访问</button>
-                <form class="search-form" id="searchForm">
-                    <input type="text" class="search-input" id="searchInput" placeholder="搜索记忆中的名字、ID 或代号...">
-                    <button type="submit" class="btn">搜索</button>
-                </form>
+                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="btn" id="randomBtn">🎲 随机访问</button>
+                    <form class="search-form" id="searchForm" style="flex: 1; min-width: 200px; max-width: 400px; display: flex;">
+                        <input type="text" class="search-input" id="searchInput" placeholder="搜索记忆中的名字、ID 或代号...">
+                        <button type="submit" class="btn">搜索</button>
+                    </form>
+                </div>
                 <p style="font-size: 0.8rem; color: #666; text-align: center; margin-top: 0.5rem;">*
-                    本站搜索仅为本地客户端匹配，不收集任何搜索记录</p>
+                   本站搜索仅为本地客户端匹配，不收集任何搜索记录</p>
             </section>
 
             <section class="profiles-grid" id="profilesGrid">
