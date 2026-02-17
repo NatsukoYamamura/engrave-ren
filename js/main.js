@@ -134,7 +134,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1. 初始化加载数据
     loadProfiles();
     
-    // 2. 绑定搜索表单提交事件 (修复按钮无法按下问题)
+    // 2. 随机访问按钮
+    const randomBtn = document.getElementById('randomBtn');
+    if (randomBtn) {
+        randomBtn.addEventListener('click', async function() {
+            const profiles = await loadAllProfiles();
+            if (profiles.length > 0) {
+                const randomProfile = profiles[Math.floor(Math.random() * profiles.length)];
+                window.location.href = '/profile.html?id=' + encodeURIComponent(randomProfile.id);
+            }
+        });
+    }
+    
+    // 3. 绑定搜索表单提交事件 (修复按钮无法按下问题)
     if (searchForm) {
         searchForm.addEventListener('submit', function(e) {
             e.preventDefault(); // 阻止表单默认提交刷新页面
@@ -156,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 3. 添加返回顶部按钮
+    // 4. 添加返回顶部按钮
     window.addEventListener('scroll', function() {
         const scrollButton = document.getElementById('scrollToTop');
         if (!scrollButton) {
@@ -199,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 4. 键盘导航
+    // 5. 键盘导航
     document.addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
