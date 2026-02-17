@@ -4,7 +4,7 @@
 const COMMENT_CONFIG = {
     system: 'utterances',
     utterances: {
-        repo: 'NatsukoYamamura/engrave-ren',
+        repo: 'engrave-ren/engrave-ren',
         issueTerm: 'url',
         label: 'comment',
         theme: 'github-light'
