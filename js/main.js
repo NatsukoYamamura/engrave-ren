@@ -210,6 +210,42 @@ function renderBirthdays() {
     `).join('');
 }
 
+// 渲染今日祭日
+function renderAnniversaries() {
+    const anniversarySection = document.getElementById('anniversarySection');
+    const anniversaryGrid = document.getElementById('anniversaryGrid');
+    if (!anniversarySection || !anniversaryGrid) return;
+    
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    
+    const todayProfiles = cachedProfiles.filter(p => {
+        if (!p.passDate) return false;
+        const parts = p.passDate.split('-');
+        if (parts.length !== 3) return false;
+        return parseInt(parts[1]) === month && parseInt(parts[2]) === day;
+    });
+    
+    if (todayProfiles.length === 0) {
+        anniversarySection.style.display = 'none';
+        return;
+    }
+    
+    anniversarySection.style.display = 'block';
+    anniversaryGrid.style.display = 'grid';
+    anniversaryGrid.innerHTML = todayProfiles.map(profile => `
+        <div class="profile-card" onclick="window.location.href='/profile.html?id=${encodeURIComponent(profile.id)}'" style="cursor: pointer;">
+            <img src="/data/people/${profile.id}/avatar.jpg" 
+                 alt="${profile.name}" 
+                 class="profile-avatar" 
+                 onerror="this.src='/images/default-avatar.svg'">
+            <div class="profile-name">${profile.name}</div>
+            <div class="profile-bio">${generateBio(profile)}</div>
+        </div>
+    `).join('');
+}
+
 // 页面加载完成后的初始化
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.getElementById('searchForm');
@@ -219,6 +255,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadProfiles().then(() => {
         // 2. 渲染今日生日（等待数据加载完成后执行）
         renderBirthdays();
+        // 3. 渲染今日祭日
+        renderAnniversaries();
     });
     
     // 3. 随机访问按钮
