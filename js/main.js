@@ -3,6 +3,12 @@
 // 全局缓存，避免重复请求
 let cachedProfiles = [];
 
+// 逝世时间范围过滤
+let passDateFilter = {
+    from: null,
+    to: null
+};
+
 // 加载所有人物数据
 async function loadAllProfiles() {
     // 如果已经加载过，直接返回缓存
@@ -54,11 +60,31 @@ async function loadProfiles() {
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search') || '';
     
-    // 3. 更新搜索框显示
+    // 获取逝世时间范围参数
+    const passDateFrom = urlParams.get('passDateFrom') || '';
+    const passDateTo = urlParams.get('passDateTo') || '';
+    
+    // 更新搜索框显示
     const searchInput = document.getElementById('searchInput');
     if (searchInput && searchInput.value !== searchQuery) {
         searchInput.value = searchQuery;
     }
+    
+    // 更新日期选择器显示
+    const passDateFromInput = document.getElementById('passDateFrom');
+    const passDateToInput = document.getElementById('passDateTo');
+    if (passDateFromInput && passDateFromInput.value !== passDateFrom) {
+        passDateFromInput.value = passDateFrom;
+    }
+    if (passDateToInput && passDateToInput.value !== passDateTo) {
+        passDateToInput.value = passDateTo;
+    }
+    
+    // 设置全局日期过滤条件
+    passDateFilter = {
+        from: passDateFrom || null,
+        to: passDateTo || null
+    };
     
     // 4. 过滤 profiles
     const filteredProfiles = filterProfiles(profiles, searchQuery);
@@ -69,20 +95,42 @@ async function loadProfiles() {
 
 // 核心过滤逻辑 (支持 ID 搜索)
 function filterProfiles(profiles, query) {
-    if (!query) return profiles;
+    if (!query && !passDateFilter.from && !passDateFilter.to) return profiles;
     
-    const lowerQuery = query.toLowerCase().trim();
+    const lowerQuery = query ? query.toLowerCase().trim() : '';
     
     return profiles.filter(p => {
         if (!p) return false;
         
-        // 检查各个字段是否存在且包含搜索词 (不区分大小写)
-        const matchId = p.id && p.id.toLowerCase().includes(lowerQuery);
-        const matchName = p.name && p.name.toLowerCase().includes(lowerQuery);
-        const matchHandle = p.handle && p.handle.toLowerCase().includes(lowerQuery);
-        const matchAliases = p.aliases && p.aliases.toLowerCase().includes(lowerQuery);
+        // 文本搜索匹配
+        let textMatch = true;
+        if (lowerQuery) {
+            const matchId = p.id && p.id.toLowerCase().includes(lowerQuery);
+            const matchName = p.name && p.name.toLowerCase().includes(lowerQuery);
+            const matchHandle = p.handle && p.handle.toLowerCase().includes(lowerQuery);
+            const matchAliases = p.aliases && p.aliases.toLowerCase().includes(lowerQuery);
+            textMatch = matchId || matchName || matchHandle || matchAliases;
+        }
         
-        return matchId || matchName || matchHandle || matchAliases;
+        // 逝世时间范围匹配
+        let dateMatch = true;
+        if (passDateFilter.from || passDateFilter.to) {
+            if (!p.passDate) {
+                dateMatch = false;
+            } else {
+                const passDate = new Date(p.passDate);
+                if (passDateFilter.from) {
+                    const fromDate = new Date(passDateFilter.from);
+                    dateMatch = dateMatch && passDate >= fromDate;
+                }
+                if (passDateFilter.to) {
+                    const toDate = new Date(passDateFilter.to);
+                    dateMatch = dateMatch && passDate <= toDate;
+                }
+            }
+        }
+        
+        return textMatch && dateMatch;
     });
 }
 
@@ -203,6 +251,69 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 执行过滤和渲染
             const filtered = filterProfiles(cachedProfiles, query);
+            renderProfiles(filtered);
+        });
+    }
+    
+    // 3.1 绑定逝世时间范围筛选按钮
+    const filterByDateBtn = document.getElementById('filterByDateBtn');
+    const clearDateFilterBtn = document.getElementById('clearDateFilterBtn');
+    const passDateFromInput = document.getElementById('passDateFrom');
+    const passDateToInput = document.getElementById('passDateTo');
+    
+    if (filterByDateBtn) {
+        filterByDateBtn.addEventListener('click', function() {
+            const fromDate = passDateFromInput ? passDateFromInput.value : '';
+            const toDate = passDateToInput ? passDateToInput.value : '';
+            
+            // 更新 URL 参数
+            const newUrl = new URL(window.location);
+            if (fromDate) {
+                newUrl.searchParams.set('passDateFrom', fromDate);
+            } else {
+                newUrl.searchParams.delete('passDateFrom');
+            }
+            if (toDate) {
+                newUrl.searchParams.set('passDateTo', toDate);
+            } else {
+                newUrl.searchParams.delete('passDateTo');
+            }
+            window.history.pushState({}, '', newUrl);
+            
+            // 更新全局过滤条件
+            passDateFilter = {
+                from: fromDate || null,
+                to: toDate || null
+            };
+            
+            // 执行过滤和渲染
+            const searchQuery = searchInput ? searchInput.value.trim() : '';
+            const filtered = filterProfiles(cachedProfiles, searchQuery);
+            renderProfiles(filtered);
+        });
+    }
+    
+    if (clearDateFilterBtn) {
+        clearDateFilterBtn.addEventListener('click', function() {
+            // 清空日期输入框
+            if (passDateFromInput) passDateFromInput.value = '';
+            if (passDateToInput) passDateToInput.value = '';
+            
+            // 更新 URL 参数
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.delete('passDateFrom');
+            newUrl.searchParams.delete('passDateTo');
+            window.history.pushState({}, '', newUrl);
+            
+            // 更新全局过滤条件
+            passDateFilter = {
+                from: null,
+                to: null
+            };
+            
+            // 执行过滤和渲染
+            const searchQuery = searchInput ? searchInput.value.trim() : '';
+            const filtered = filterProfiles(cachedProfiles, searchQuery);
             renderProfiles(filtered);
         });
     }

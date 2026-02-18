@@ -177,6 +177,20 @@ nav {
     border-color: var(--sky-blue);
 }
 
+/* Date Input Styles */
+.date-input {
+    padding: 8px 12px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.date-input:focus {
+    border-color: var(--sky-blue);
+}
+
 /* Profile Cards Grid */
 .profiles-grid {
     display: grid;
