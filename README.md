@@ -26,6 +26,8 @@ https://engrave.ren/
     ├── profiles.json     # 纪念人物 ID 列表
     └── people/
         └── [人物ID]/
+            ├── resources/
+            │   └── xxx.xxx # 资源文件（照片，视频等）
             ├── info.json  # 基本信息
             ├── bio.md    # 生平介绍 (Markdown)
             └── avatar.jpg # 头像图片
