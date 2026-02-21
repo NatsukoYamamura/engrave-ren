@@ -30,7 +30,7 @@ function getProfileId() {
 // 渲染评论区域
 function renderCommentsSection() {
     const profileId = getProfileId();
-    
+
     if (!COMMENT_CONFIG.utterances.repo) {
         return `
             <section class="memories-section" id="commentsSection">
@@ -42,7 +42,7 @@ function renderCommentsSection() {
             </section>
         `;
     }
-    
+
     return `
         <section class="memories-section" id="commentsSection">
             <h2 style="text-align: center; margin-bottom: 2rem;">回忆与祝福</h2>
@@ -55,9 +55,9 @@ function renderCommentsSection() {
 function loadUtterances() {
     const container = document.getElementById('utterances-container');
     if (!container) return;
-    
+
     const config = COMMENT_CONFIG.utterances;
-    
+
     const script = document.createElement('script');
     script.src = 'https://utteranc.es/client.js';
     script.setAttribute('repo', config.repo);
@@ -66,7 +66,7 @@ function loadUtterances() {
     script.setAttribute('theme', config.theme);
     script.setAttribute('crossorigin', 'anonymous');
     script.async = true;
-    
+
     container.appendChild(script);
 }
 
@@ -76,25 +76,25 @@ function loadUtterances() {
 async function loadProfile() {
     const profileId = getProfileId();
     console.log('loadProfile, profileId:', profileId);  // 调试
-    
+
     if (!profileId) {
         showError('未指定人物');
         return;
     }
-    
+
     try {
         // 加载基本信息
         const infoUrl = `/data/people/${profileId}/info.json`;
         console.log('Fetching:', infoUrl);  // 调试
         const infoResponse = await fetch(infoUrl);
         console.log('Response status:', infoResponse.status);  // 调试
-        
+
         if (!infoResponse.ok) {
             showError('未找到该纪念人物: ' + profileId);
             return;
         }
         const profile = await infoResponse.json();
-        
+
         // 尝试加载生平介绍
         let bio = '';
         try {
@@ -107,7 +107,7 @@ async function loadProfile() {
         } catch (e) {
             console.log('无生平介绍');
         }
-        
+
         await renderProfile(profile, bio);
     } catch (error) {
         console.error('加载人物数据失败:', error);
@@ -118,15 +118,15 @@ async function loadProfile() {
 // 渲染个人资料页面
 async function renderProfile(profile, bio) {
     document.getElementById('pageTitle').textContent = `${profile.name} - 星语铭`;
-    
+
     let ageText = profile.age || '';
     if (profile.birthDate && profile.passDate && !profile.age) {
         ageText = calculateAge(profile.birthDate, profile.passDate);
     }
-    
+
     // 头像路径
     const avatar = `/data/people/${profile.id}/avatar.jpg`;
-    
+
     // 网站链接
     let websiteLinks = '';
     if (profile.websites && Array.isArray(profile.websites) && profile.websites.length > 0) {
@@ -135,7 +135,7 @@ async function renderProfile(profile, bio) {
         }).join(' ');
         websiteLinks = `<div class="profile-info-item"><strong>链接：</strong>${linksHtml}</div>`;
     }
-    
+
     // 引用资料链接
     let sourceLinks = '';
     if (profile.sources && Array.isArray(profile.sources) && profile.sources.length > 0) {
@@ -144,7 +144,7 @@ async function renderProfile(profile, bio) {
         }).join(' ');
         sourceLinks = `<div class="profile-info-item"><strong>引用资料：</strong>${linksHtml}</div>`;
     }
-    
+
     const content = document.getElementById('profileContent');
     content.innerHTML = `
         <section class="profile-header">
@@ -176,21 +176,26 @@ async function renderProfile(profile, bio) {
         ${renderCommentsSection()}
 
         <section class="prevention-section">
-            <h3>🌟 请记住</h3>
-            <p>如果您正在经历困难时期，请不要犹豫寻求帮助。每个人都有获得支持和关怀的权利。</p>
+            <h3>🌟 心理支持与援助资源</h3>
+            <p>如果您正在经历困难时期，请记住您不是一个人。以下资源可以为您提供帮助：</p>
             <div class="prevention-resources">
                 <div class="resource-card">
-                    <h4>📞 紧急热线</h4>
+                    <h4>📞 援助热线</h4>
                     <p>全国心理援助热线：<strong>400-161-9995</strong></p>
+                    <p>北京心理危机研究与干预中心：<strong>800-810-1117</strong></p>
                 </div>
                 <div class="resource-card">
-                    <h4>💬 在线支持</h4>
-                    <p>您也可以通过我们网站的联系方式寻求帮助</p>
+                    <h4>🏥 专业支持</h4>
+                    <p>请及时就医，寻求专业心理咨询师或医生的帮助</p>
+                </div>
+                <div class="resource-card">
+                    <h4>👥 社区陪伴</h4>
+                    <p>联系当地心理健康中心或社区服务中心</p>
                 </div>
             </div>
         </section>
     `;
-    
+
     // 加载 Utterances 评论
     loadUtterances();
 }
@@ -200,40 +205,46 @@ function calculateAge(birthDate, passDate) {
     try {
         const birth = new Date(birthDate);
         const pass = new Date(passDate);
-        
+
         if (isNaN(birth.getTime()) || isNaN(pass.getTime())) {
             return '';
         }
-        
+
         let age = pass.getFullYear() - birth.getFullYear();
         const monthDiff = pass.getMonth() - birth.getMonth();
-        
+
         if (monthDiff < 0 || (monthDiff === 0 && pass.getDate() < birth.getDate())) {
             age--;
         }
-        
+
         return age > 0 ? `${age}岁` : '';
     } catch (e) {
         return '';
     }
 }
 
-// 使用 marked.js 解析 Markdown
+// 使用 marked.js 解析 Markdown（GitHub 风格）
 function parseMarkdown(text) {
     if (!text) return '';
-    
-    // 配置 marked
+
+    // 配置 marked（更接近 GitHub 渲染）
     marked.setOptions({
-        breaks: true,      // 允许换行
-        gfm: true,         // GitHub 风格 Markdown
-        linkTarget: '_blank'  // 链接新窗口打开
+        breaks: true,           // 允许换行
+        gfm: true,              // GitHub 风格 Markdown
+        headerIds: true,        // 添加标题 ID
+        mangle: false,          // 不转义邮件链接
+        linkTarget: '_blank',   // 链接新窗口打开
+        pedantic: false,        // 不严格遵循原始 Markdown
+        smartLists: true,       // 智能列表
+        smartypants: false      // 不使用排版引号
     });
-    
+
     // 解析并消毒 HTML
     const html = marked.parse(text);
     return DOMPurify.sanitize(html, {
-        ADD_ATTR: ['target'],  // 允许 target 属性
-        ADD_TAGS: ['iframe']  // 允许 iframe
+        ADD_ATTR: ['target'],   // 允许 target 属性
+        ADD_TAGS: ['iframe'],   // 允许 iframe
+        FORCE_BODY: true        // 强制解析为完整 HTML
     });
 }
 

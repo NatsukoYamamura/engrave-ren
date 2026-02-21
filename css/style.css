@@ -303,23 +303,23 @@ footer a:hover {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .intro-section {
         padding: 2rem;
     }
-    
+
     .search-form {
         flex-direction: column;
     }
-    
+
     .search-input {
         width: 100%;
     }
-    
+
     .profiles-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .prevention-resources {
         flex-direction: column;
     }
@@ -416,4 +416,177 @@ footer a:hover {
     font-size: 1.2rem;
     color: var(--text-light);
     margin-bottom: 2rem;
+}
+
+/* ========== Markdown 内容样式（GitHub 风格）========== */
+
+/* 引用块 */
+.profile-bio-section blockquote {
+    border-left: 4px solid var(--coral-pink);
+    background: var(--light-gray);
+    margin: 1.5em 0;
+    padding: 1em 1.5em;
+    color: var(--text-light);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+}
+
+.profile-bio-section blockquote p {
+    margin: 0.5em 0;
+}
+
+.profile-bio-section blockquote> :first-child {
+    margin-top: 0;
+}
+
+.profile-bio-section blockquote> :last-child {
+    margin-bottom: 0;
+}
+
+/* 代码块 */
+.profile-bio-section pre {
+    background: #f6f8fa;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    margin: 1em 0;
+}
+
+.profile-bio-section code {
+    background: rgba(135, 206, 235, 0.2);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 85%;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    margin: 0;
+}
+
+.profile-bio-section pre code {
+    background: transparent;
+    padding: 0;
+    font-size: 100%;
+}
+
+/* 表格 */
+.profile-bio-section table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.profile-bio-section table th,
+.profile-bio-section table td {
+    border: 1px solid var(--border-light);
+    padding: 10px 14px;
+    text-align: left;
+}
+
+.profile-bio-section table th {
+    background: var(--light-blue);
+    font-weight: 600;
+    color: var(--klein-blue);
+}
+
+.profile-bio-section table tr:nth-child(even) {
+    background: var(--light-gray);
+}
+
+/* 列表 */
+.profile-bio-section ul,
+.profile-bio-section ol {
+    padding-left: 2em;
+    margin: 1em 0;
+}
+
+.profile-bio-section ul li,
+.profile-bio-section ol li {
+    margin: 0.5em 0;
+    line-height: 1.8;
+}
+
+.profile-bio-section ul {
+    list-style-type: disc;
+}
+
+.profile-bio-section ol {
+    list-style-type: decimal;
+}
+
+/* 标题 */
+.profile-bio-section h1,
+.profile-bio-section h2,
+.profile-bio-section h3,
+.profile-bio-section h4,
+.profile-bio-section h5,
+.profile-bio-section h6 {
+    margin-top: 1.5em;
+    margin-bottom: 1em;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text-dark);
+}
+
+.profile-bio-section h1 {
+    font-size: 2em;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 0.3em;
+}
+
+.profile-bio-section h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.3em;
+}
+
+.profile-bio-section h3 {
+    font-size: 1.25em;
+}
+
+/* 链接 */
+.profile-bio-section a {
+    color: var(--sky-blue);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.profile-bio-section a:hover {
+    border-bottom-color: var(--coral-pink);
+}
+
+/* 图片 */
+.profile-bio-section img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 1em 0;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* 水平线 */
+.profile-bio-section hr {
+    border: none;
+    border-top: 2px solid var(--border-light);
+    margin: 2em 0;
+}
+
+/* 任务列表 */
+.profile-bio-section input[type="checkbox"] {
+    margin-right: 0.5em;
+}
+
+/* 强调 */
+.profile-bio-section strong {
+    font-weight: 600;
+    color: var(--klein-blue);
+}
+
+.profile-bio-section em {
+    font-style: italic;
+    color: var(--text-light);
 }
