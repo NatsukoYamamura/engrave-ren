@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 </head>
+
 <body>
     <header>
         <nav>
@@ -39,71 +41,71 @@
     </footer>
 
     <script src="/js/profile.js"></script>
-    
+
     <script>
-    // ========== 原有功能 ==========
-    
-    // 动态年份
-    document.getElementById('year').textContent = new Date().getFullYear();
+        // ========== 原有功能 ==========
 
-    // 初始化加载
-    document.addEventListener('DOMContentLoaded', function() {
-        loadProfiles();
-    });
+        // 动态年份
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-    // 标准化 id 参数
-    const urlParams = new URLSearchParams(window.location.search);
-    let id = urlParams.get('id');
+        // 初始化加载
+        document.addEventListener('DOMContentLoaded', function () {
+            loadProfiles();
+        });
 
-    if (id) {
-      const normalizedId = id.toLowerCase();
-      if (id !== normalizedId) {
-        window.history.replaceState({}, '', `${window.location.pathname}?id=${normalizedId}`);
-      }
-      console.log('加载用户资料:', normalizedId);
-      // loadProfile(normalizedId);
-    }
+        // 标准化 id 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        let id = urlParams.get('id');
 
-    // ========== 复制时添加注释（无提示版） ==========
-    
-    document.addEventListener('copy', function(event) {
-      const selectedText = window.getSelection()?.toString().trim();
-      if (!selectedText) return;
+        if (id) {
+            const normalizedId = id.toLowerCase();
+            if (id !== normalizedId) {
+                window.history.replaceState({}, '', `${window.location.pathname}?id=${normalizedId}`);
+            }
+            console.log('加载用户资料:', normalizedId);
+            // loadProfile(normalizedId);
+        }
 
-      // 排除输入框、文本域、可编辑区域
-      const activeEl = document.activeElement;
-      if (activeEl && (
-        activeEl.tagName === 'INPUT' || 
-        activeEl.tagName === 'TEXTAREA' || 
-        activeEl.isContentEditable
-      )) {
-        return;
-      }
+        // ========== 复制时添加注释 ==========
 
-      const siteName = '星语铭';
-      const siteOrigin = window.location.origin;
-      const siteUrl = window.location.href;
-      const license = 'CC BY-NC-SA 4.0';
-      const licenseUrl = 'https://creativecommons.org/licenses/by-nc-sa/4.0/';
+        document.addEventListener('copy', function (event) {
+            const selectedText = window.getSelection()?.toString().trim();
+            if (!selectedText) return;
 
-      const footer = [
-        '',
-        '',
-        `来源：${siteName} (${siteOrigin})`,
-        `链接：${siteUrl}`,
-        `许可：${license} ${licenseUrl}`,
-        `请遵守：署名 - 非商业性使用 - 相同方式共享`
-      ].join('\n');
+            // 排除输入框、文本域、可编辑区域
+            const activeEl = document.activeElement;
+            if (activeEl && (
+                activeEl.tagName === 'INPUT' ||
+                activeEl.tagName === 'TEXTAREA' ||
+                activeEl.isContentEditable
+            )) {
+                return;
+            }
 
-      // 防止重复添加
-      if (selectedText.includes(`来源：${siteName}`)) {
-        return;
-      }
+            const siteName = '星语铭';
+            const siteOrigin = window.location.origin;
+            const siteUrl = window.location.href;
+            const license = 'CC BY-NC-SA 4.0';
+            const licenseUrl = 'https://creativecommons.org/licenses/by-nc-sa/4.0/';
 
-      event.preventDefault();
-      event.clipboardData.setData('text/plain', selectedText + footer);
-    });
-</script>
+            const footer = [
+                '',
+                '',
+                `来源：${siteName} (${siteOrigin})`,
+                `链接：${siteUrl}`,
+                `许可：${license} ${licenseUrl}`,
+                `请遵守：署名 - 非商业性使用 - 相同方式共享`
+            ].join('\n');
+
+            // 防止重复添加
+            if (selectedText.includes(`来源：${siteName}`)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.clipboardData.setData('text/plain', selectedText + footer);
+        });
+    </script>
 </body>
-</html>
 
+</html>
